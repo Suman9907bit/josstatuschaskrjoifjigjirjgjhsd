@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#087f8c">
+<meta name="description" content="Jana Online Service account application status checker">
+<title>Account Status Check | Jana Online Service</title>
+<style>
+:root{--navy:#082f49;--teal:#087f8c;--aqua:#20c4c7;--green:#16845b;--red:#c62828;--amber:#a86200;--bg:#f3f8fb;--ink:#152b3a;--muted:#607483;--line:#dce7ee;--white:#fff;--shadow:0 18px 50px rgba(8,47,73,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,.wrap,.topbar,.hero,.card,.card-head,.side,.footer,.admin-welcome,.welcome-message,.result,.result-banner,.details,.detail,.step,.notice{
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+input,textarea{ -webkit-user-select:text; -moz-user-select:text; -ms-user-select:text; user-select:text; }
+body{font-family:Arial,"Noto Sans Bengali",sans-serif;background:linear-gradient(140deg,#e8fbfc 0%,#f4f8fc 48%,#edf4ff 100%);color:var(--ink);min-height:100vh}
+button,input{font:inherit}
+.wrap{width:min(100% - 28px,1000px);margin:0 auto;padding:22px 0 30px}
+.topbar{display:flex;align-items:center;gap:13px;padding:15px 18px;background:var(--navy);color:#fff;border-radius:18px;box-shadow:var(--shadow)}
+.brandmark{width:60px;height:48px;flex:0 0 48px;border-radius:15px;background:linear-gradient(135deg,var(--aqua),#0e7490);display:grid;place-items:center;font-weight:900;font-size:22px;color:#fff;border:1px solid #ffffff55}
+.brand h1{font-size:clamp(17px,3vw,23px);line-height:1.25}
+.brand p{font-size:12px;color:#c9edf2;margin-top:4px;letter-spacing:.4px}
+.secure{margin-left:auto;align-self:flex-start;border:1px solid #ffffff40;background:#ffffff12;border-radius:99px;padding:7px 10px;font-size:11px;white-space:nowrap}
+.hero{padding:30px 10px 20px;text-align:center}
+.hero .eyebrow{display:inline-block;color:var(--teal);background:#d8f7f6;border:1px solid #b5e9e8;border-radius:99px;padding:7px 12px;font-size:12px;font-weight:800;letter-spacing:.5px}
+.hero h2{font-size:clamp(25px,5vw,38px);color:var(--navy);margin:14px 0 10px;line-height:1.2}
+.hero p{max-width:650px;margin:0 auto;color:var(--muted);font-size:15px;line-height:1.7}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.72fr);gap:20px;align-items:start}
+.card{background:var(--white);border:1px solid #e3edf2;border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.card-head{padding:20px 22px;background:linear-gradient(120deg,#f4ffff,#f5f9ff);border-bottom:1px solid var(--line)}
+.card-head h3{font-size:18px;color:var(--navy)}
+.card-head p{font-size:13px;line-height:1.6;color:var(--muted);margin-top:6px}
+.card-body{padding:22px}
+.label{display:block;font-size:13px;font-weight:800;margin-bottom:9px;color:#29495a}
+.field{position:relative}
+.field input{width:100%;min-height:52px;padding:14px 15px;border:1.5px solid #cddde5;border-radius:12px;outline:none;color:var(--ink);background:#fff;transition:.2s}
+.field input:focus{border-color:var(--teal);box-shadow:0 0 0 4px #087f8c18}
+.hint{font-size:12px;line-height:1.6;color:var(--muted);margin-top:9px}
+.primary{width:100%;border:0;border-radius:12px;background:linear-gradient(110deg,var(--teal),#075985);color:#fff;font-weight:800;min-height:51px;padding:13px 16px;margin-top:18px;box-shadow:0 8px 18px #087f8c25;transition:transform .15s,opacity .15s}
+.primary:hover{transform:translateY(-1px)}.primary:disabled{opacity:.65;cursor:wait;transform:none}
+.message{display:none;margin-top:17px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6}
+.message.show{display:block}.message.error{background:#fff0f0;border:1px solid #ffcaca;color:#9e1b1b}.message.info{background:#edf9ff;border:1px solid #cceafa;color:#14536e}
+.result{display:none;margin-top:20px;border:1px solid var(--line);border-radius:16px;overflow:hidden}.result.show{display:block}
+.result-banner{padding:18px;background:#f8fafc;display:flex;align-items:center;gap:13px}
+.status-icon{width:45px;height:45px;border-radius:14px;display:grid;place-items:center;font-size:23px;flex:0 0 45px}
+.status-title{font-size:17px;font-weight:900;color:var(--navy)}.status-sub{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5}
+.pill{display:inline-block;border-radius:99px;padding:6px 10px;font-size:11px;font-weight:900;letter-spacing:.4px;margin-top:8px}
+.active .result-banner{background:#ecfbf3}.active .status-icon{background:#d0f7e1;color:#087443}.active .pill{background:#d0f7e1;color:#087443}
+.inactive .result-banner{background:#fff5e8}.inactive .status-icon{background:#ffebc8;color:#965400}.inactive .pill{background:#ffebc8;color:#965400}
+.blocked .result-banner{background:#fff0f0}.blocked .status-icon{background:#ffdcdc;color:#a11d1d}.blocked .pill{background:#ffdcdc;color:#a11d1d}
+.unknown .result-banner{background:#eef6ff}.unknown .status-icon{background:#dcecff;color:#175b92}.unknown .pill{background:#dcecff;color:#175b92}
+.details{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:8px 16px 15px}
+.detail{padding:12px 7px;border-bottom:1px solid #edf1f4;min-width:0}
+.detail:nth-last-child(-n+2){border-bottom:0}
+.detail small{display:block;color:var(--muted);font-size:11px;margin-bottom:6px}
+.detail strong{display:block;font-size:13px;line-height:1.5;overflow-wrap:anywhere;color:#203d4e}
+.side{padding:21px}
+.side h3{font-size:17px;color:var(--navy);margin-bottom:15px}
+.step{display:flex;gap:12px;margin:15px 0}
+.step-num{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:#dff7f6;color:#087f8c;font-weight:900;flex:0 0 30px}
+.step strong{font-size:13px;display:block;margin:1px 0 5px}
+.step p{font-size:12px;line-height:1.6;color:var(--muted)}
+.notice{margin-top:17px;padding:13px;border-radius:12px;background:#f2f7fb;border:1px solid var(--line);font-size:12px;line-height:1.65;color:#526a79}
+.footer{text-align:center;color:#6a7d89;font-size:12px;line-height:1.7;padding:22px 10px 0}
+.footer strong{color:var(--navy)}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid #ffffff77;border-top-color:#fff;border-radius:50%;vertical-align:middle;margin-right:8px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.admin-welcome{margin-top:20px;border:1px solid #cce8ed;border-radius:17px;overflow:hidden;background:linear-gradient(145deg,#f4ffff,#ffffff 60%,#f2f7ff);box-shadow:0 10px 26px rgba(8,47,73,.07)}
+.admin-welcome-top{display:flex;align-items:center;gap:13px;padding:17px 18px;background:linear-gradient(115deg,#082f49,#087f8c);color:#fff}
+.admin-photo{width:58px;height:58px;flex:0 0 58px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(140deg,#22d3c5,#0e7490);border:2px solid #ffffffa8;color:#fff;font-size:18px;font-weight:900;letter-spacing:.5px;box-shadow:0 5px 16px #001f3533}
+.admin-label{display:inline-block;font-size:10px;font-weight:900;letter-spacing:1.5px;color:#a9f3ee;margin-bottom:4px}
+.admin-heading h3{font-size:19px;line-height:1.3;color:#fff}
+.admin-heading p{font-size:12px;color:#d1f3f4;margin-top:4px}
+.welcome-message{padding:18px 19px 14px}
+.welcome-message h4{font-size:16px;color:#075985;line-height:1.5;margin-bottom:10px}
+.welcome-message p{font-size:13px;line-height:1.85;color:#496170;margin-bottom:10px}
+.signature{border-left:3px solid #12a8a9;padding:7px 0 7px 12px;margin-top:12px;font-size:12px;line-height:1.8;color:#597180}
+.signature strong{color:#082f49;font-size:14px}
+.admin-contact{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 18px}
+.contact-link{display:flex;align-items:center;gap:9px;text-decoration:none;border:1px solid #d6e8ec;border-radius:12px;background:#fff;padding:11px;color:#087f8c;min-width:0}
+.contact-link span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.contact-link small{font-size:10px;color:#6a7d89}
+.contact-link strong{font-size:12px;color:#123f54;overflow-wrap:anywhere}
+
+@media(max-width:760px){.layout{grid-template-columns:1fr}.hero{padding:25px 5px 18px}.card-body{padding:18px}.side{padding:19px}.secure{display:none}}
+@media(max-width:420px){.admin-contact{grid-template-columns:1fr}.admin-welcome-top{padding:15px}.welcome-message{padding:16px}.wrap{width:min(100% - 18px,1000px);padding-top:10px}.topbar{border-radius:14px;padding:13px}.brandmark{width:42px;height:42px;flex-basis:42px}.brand p{font-size:10px}.details{grid-template-columns:1fr}.detail:nth-last-child(-n+2){border-bottom:1px solid #edf1f4}.detail:last-child{border-bottom:0}.result-banner{padding:15px}.hero p{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brandmark"><image src="https://lh3.googleusercontent.com/a-/ALV-UjU7cHPZFGO9gFXLALp74oNXb6GSIh5C79vtvmw7_MtTelJdO-Wq=w1425" class="brandmark"></image> </div>
+    <div class="brand">
+      <h1>Jana Online Service</h1>
+      <p>USER ACCOUNT STATUS PORTAL</p>
+    </div>
+    <div class="secure">🔒 Status Check</div>
+  </header>
+
+  <section class="hero">
+    <span class="eyebrow">ACCOUNT VERIFICATION</span>
+    <h2>আপনার Account Status দেখুন</h2>
+    <p>User ID অথবা Registration-এর Mobile Number দিয়ে আপনার অ্যাকাউন্ট Active, Inactive, Pending বা অন্য কোনো অবস্থায় আছে কি না যাচাই করুন।</p>
+  </section>
+
+  <main class="layout">
+    <section class="card">
+      <div class="card-head">
+        <h3>🔎 Status Check</h3>
+        <p>রেজিস্ট্রেশনের সময় পাওয়া User ID অথবা মোবাইল নম্বর লিখুন।</p>
+      </div>
+      <div class="card-body">
+        <form id="statusForm">
+          <label class="label" for="lookup">User ID / Mobile Number</label>
+          <div class="field">
+            <input id="lookup" name="lookup" type="text" maxlength="80" autocomplete="off" placeholder="যেমন: JOS10001 / 9876543210" required>
+          </div>
+          <p class="hint">Registration-এর সময় দেওয়া সঠিক User ID অথবা Mobile Number ব্যবহার করুন।</p>
+          <button class="primary" id="checkBtn" type="submit">Check Account Status</button>
+        </form>
+        <div class="message" id="message" role="status" aria-live="polite"></div>
+        <section class="result" id="result" aria-live="polite">
+          <div class="result-banner">
+            <div class="status-icon" id="statusIcon">●</div>
+            <div>
+              <div class="status-title" id="statusTitle">Account Status</div>
+              <div class="status-sub" id="statusSub"></div>
+              <span class="pill" id="statusPill"></span>
+            </div>
+          </div>
+          <div class="details" id="details"></div>
+        </section>
+
+        <section class="admin-welcome" aria-label="Admin support">
+          <div class="admin-welcome-top">
+            <div class="admin-photo" aria-hidden="true"><image src="https://lh3.googleusercontent.com/K8NlQ1hM76srQiBouEEhd9dyY76vpgeXC97uAG7Rk04gKWgVvyhA1OYQGjF0QM19CJ0Hv6362poeurukaA=w1425"  class="admin-photo"></image></div>
+            <div class="admin-heading">
+              <span class="admin-label">YOUR ADMIN</span>
+              <h3>Mr.Suman jana</h3>
+              <p>Jana Online Service</p>
+            </div>
+          </div>
+          <div class="welcome-message">
+            <h4>প্রিয় ব্যবহারকারী, আপনাকে আন্তরিক স্বাগতম! 💙</h4>
+            <p>Jana Online Service-এর সঙ্গে যুক্ত থাকার জন্য আপনাকে ধন্যবাদ। আপনার অ্যাকাউন্টের Status বা পরিষেবা ব্যবহার করতে কোনো সমস্যা হলে চিন্তা করবেন না। আমরা আপনার সমস্যা বুঝে যথাসম্ভব সহায়তা করার চেষ্টা করব।</p>
+            <p>আপনার কোনো প্রশ্ন, পরামর্শ বা সমস্যা থাকলে নির্দ্বিধায় যোগাযোগ করুন। আপনার সুবিধা ও সন্তুষ্টিই আমাদের কাছে গুরুত্বপূর্ণ।</p>
+            <div class="signature">শুভেচ্ছান্তে,<br><strong>Mr.Suman jana</strong><br>আপনার Admin — Jana Online Service</div>
+          </div>
+          <div class="admin-contact">
+            <a href="tel:9907992247" class="contact-link">☎ <span><small>Call Admin</small><strong>9907992247</strong></span></a>
+            <a href="mailto:janaonlineservice4@gmail.com" class="contact-link">✉ <span><small>Email Support</small><strong>Send Email</strong></span></a>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <aside class="card side">
+      <h3>কীভাবে Status দেখবেন?</h3>
+      <div class="step"><div class="step-num">1</div><div><strong>User ID বা Mobile দিন</strong><p>Registration-এর সময় দেওয়া সঠিক তথ্য লিখুন।</p></div></div>
+      <div class="step"><div class="step-num">2</div><div><strong>Check Account Status চাপুন</strong><p>সিস্টেম Server-এর মাধ্যমে তথ্য খোঁজার চেষ্টা করবে।</p></div></div>
+      <div class="step"><div class="step-num">3</div><div><strong>Status ও প্রয়োজনীয় তথ্য দেখুন</strong><p>আপনার User ID, নাম, অফিসের নাম এবং Account Status দেখা যাবে—যে তথ্য সার্ভার ফেরত দেয়।</p></div></div>
+      <div class="notice"><strong>গুরুত্বপূর্ণ:</strong> এই পেজ শুধু অ্যাকাউন্টের অবস্থা দেখানোর জন্য। অ্যাকাউন্ট Active/Inactive করা Admin-এর কাজ। Status ভুল মনে হলে Admin-এর সঙ্গে যোগাযোগ করুন।</div>
+    </aside>
+  </main>
+  <footer class="footer">
+    <strong>JANA ONLINE SERVICE (JOS)</strong><br>
+    Secure • Simple • Mobile & Computer Friendly<br>
+    Support: <a href="tel:9907992247" style="color:#087f8c;text-decoration:none;font-weight:700">9907992247</a>
+  </footer>
+</div>
+
+<script>
+/*
+  Uses the SAME Google Apps Script web-app URL found in the supplied index.html.
+  No sheet ID or Apps Script URL needs to be changed here.
+*/
+const API_URL = "https://script.google.com/macros/s/AKfycbzYM8ToB_pKlzEx6BZmuKcoABxlBVoeSMNwHBP4SxEtoZoEAiHypmpb9i61b9rsWTHZ/exec";
+
+const $ = id => document.getElementById(id);
+const form = $("statusForm");
+const button = $("checkBtn");
+
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+  const lookup = $("lookup").value.trim();
+  if (!lookup) return;
+
+  setMessage("", "");
+  $("result").className = "result";
+  button.disabled = true;
+  button.innerHTML = '<span class="spinner"></span>Checking...';
+
+  try {
+    /*
+      Existing app uses action "getUser" with userId.
+      We also send mobile and lookup fields in case the deployed Apps Script
+      supports mobile-number lookup. The page does not read the Google Sheet directly.
+    */
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {"Content-Type": "text/plain;charset=utf-8"},
+      body: JSON.stringify({
+        action: "getUser",
+        userId: lookup,
+        mobile: lookup,
+        lookup: lookup
+      })
+    });
+
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+
+    if (!data || data.success !== true || !data.user) {
+      setMessage(
+        data && data.message
+          ? data.message
+          : "আপনার দেওয়া তথ্যের সঙ্গে কোনো অ্যাকাউন্ট পাওয়া যায়নি। User ID বা Mobile Number আবার যাচাই করুন। প্রয়োজন হলে Admin-এর সঙ্গে যোগাযোগ করুন।",
+        "error"
+      );
+      return;
+    }
+
+    renderUser(data.user);
+  } catch (error) {
+    console.error(error);
+    setMessage(
+      "Google Apps Script-এর সঙ্গে সংযোগ করা যায়নি। Internet connection, Apps Script deployment access এবং API response পরীক্ষা করুন।",
+      "error"
+    );
+  } finally {
+    button.disabled = false;
+    button.textContent = "Check Account Status";
+  }
+});
+
+function setMessage(text, type) {
+  const el = $("message");
+  el.textContent = text;
+  el.className = "message" + (text ? " show " + type : "");
+}
+
+function safeText(value) {
+  if (value === undefined || value === null || String(value).trim() === "") return "—";
+  return String(value);
+}
+
+function statusStyle(status) {
+  const value = String(status || "").trim().toLowerCase();
+  if (["active", "approved", "activated", "চালু", "সক্রিয়", "সক্রিয়"].includes(value))
+    return {cls:"active", icon:"✓", title:"Account Active", sub:"আপনার অ্যাকাউন্ট Active আছে।"};
+  if (["inactive", "pending", "waiting", "নিষ্ক্রিয়", "নিষ্ক্রিয়", "অপেক্ষমাণ"].includes(value))
+    return {cls:"inactive", icon:"⌛", title:"Account Inactive / Pending", sub:"আপনার অ্যাকাউন্ট এখনো Active নয়। Admin-এর সিদ্ধান্তের জন্য অপেক্ষা করুন।"};
+  if (["blocked", "suspended", "disabled", "ব্লক"].includes(value))
+    return {cls:"blocked", icon:"!", title:"Account Restricted", sub:"অ্যাকাউন্টে সীমাবদ্ধতা রয়েছে। Admin-এর সঙ্গে যোগাযোগ করুন।"};
+  return {cls:"unknown", icon:"i", title:"Status: " + safeText(status), sub:"এই Status-এর অর্থ নিশ্চিত করতে Admin-এর সঙ্গে যোগাযোগ করুন।"};
+}
+
+function renderUser(user) {
+  const status = statusStyle(user.status);
+  const result = $("result");
+  result.className = "result show " + status.cls;
+  $("statusIcon").textContent = status.icon;
+  $("statusTitle").textContent = status.title;
+  $("statusSub").textContent = status.sub;
+  $("statusPill").textContent = "STATUS: " + safeText(user.status).toUpperCase();
+
+  const fields = [
+    ["User ID", user.userId],
+    ["Name", user.name],
+    ["Mobile Number", user.mobile],
+    ["Office Name", user.officeName],
+    ["Office Type", user.officeType],
+    ["Designation", user.designation],
+    ["District", user.district],
+    ["State", user.state]
+  ];
+
+  $("details").replaceChildren();
+  fields.forEach(([label, value]) => {
+    if (value === undefined || value === null || String(value).trim() === "") return;
+    const item = document.createElement("div");
+    item.className = "detail";
+    const small = document.createElement("small");
+    small.textContent = label;
+    const strong = document.createElement("strong");
+    strong.textContent = safeText(value);
+    item.append(small, strong);
+    $("details").appendChild(item);
+  });
+  setMessage("অ্যাকাউন্টের তথ্য পাওয়া গেছে। নিচে দেখুন।", "info");
+}
+// Disable right-click/context menu and text selection on the page.
+document.addEventListener("contextmenu", function(event) {
+  event.preventDefault();
+});
+document.addEventListener("selectstart", function(event) {
+  if (!event.target.closest("input, textarea")) event.preventDefault();
+});
+document.addEventListener("dragstart", function(event) {
+  if (!event.target.closest("input, textarea")) event.preventDefault();
+});
+</script>
+</body>
+</html>
